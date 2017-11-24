@@ -7,6 +7,8 @@ var client = new Client();
 
 function drilldriver(options){
   this.options = options;
+  //remove prefix "drill:"
+  this.options.url = /drill:(.*)/.exec(options.url)[1];
 }
 
 drilldriver.prototype.buildQuery = function(cmd, parameters){
@@ -29,7 +31,11 @@ drilldriver.prototype.get = function(url){
 
 drilldriver.prototype.post = function(url, data){
   var defer = q.defer();
-  var req = client.post(this.options.url + url, data, defer.resolve);
+  var args = {
+		  data: data,
+		  headers: { "Content-Type": "application/json" }
+  }
+  var req = client.post(this.options.url + url, args, defer.resolve);
   req.on('error', defer.reject);
   return defer.promise;
 }

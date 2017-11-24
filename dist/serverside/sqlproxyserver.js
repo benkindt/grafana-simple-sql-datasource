@@ -56,7 +56,7 @@ SQLProxyServer.prototype.runStandalone = function(){
       type: '*/*'    
     }));
     var oThis = this;
-    app.get("/", function(req, res){
+    app.get("/*", function(req, res){
       oThis.getConnection(req);
       if(!req.query.con){
         return res.status(500).send("Missing parameter `con` with connection details. "
@@ -94,7 +94,7 @@ SQLProxyServer.prototype.API = function(command){
     
     _api.test = function(){
       return _api.cmd.provider.query("SELECT 1;")
-                .then(r => {return{status:'sucess'}})
+                .then(r => {return{status:'success'}})
                 .catch(_api.internals.error);
     };
     
