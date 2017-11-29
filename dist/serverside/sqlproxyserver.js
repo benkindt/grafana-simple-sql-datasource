@@ -112,11 +112,11 @@ SQLProxyServer.prototype.API = function(command){
     
     _api.search = function(){
       /**
-       * Example array response
-       * ["upper_25","upper_50","upper_75","upper_90","upper_95"]
-       * Example map response
-       * [ { "text" :"upper_25", "value": 1}, { "text" :"upper_75", "value": 2} ]
-       */
+		 * Example array response
+		 * ["upper_25","upper_50","upper_75","upper_90","upper_95"] Example map
+		 * response [ { "text" :"upper_25", "value": 1}, { "text" :"upper_75",
+		 * "value": 2} ]
+		 */
       _api.cmd.body.targets = [{
         target: _api.cmd.body.target,
         type: 'search'
@@ -181,6 +181,10 @@ SQLProxyServer.prototype.API = function(command){
         return value;
       },
       parseTimeseries: (target, results)=>{
+    	console.log("target: ");
+        console.log(target);
+        console.log("results: ");
+        console.log(results);
         target.timestamp = _api.internals.getTimestamp(target, results);
         target.metric = _api.internals.getMetric(target, results);
         target.value = _api.internals.getMetricValue(target, results);
@@ -195,6 +199,10 @@ SQLProxyServer.prototype.API = function(command){
         return target;
       },
       parseTable: (target, results)=>{
+    	  console.log("target: ");
+          console.log(target);
+          console.log("results: ");
+          console.log(results);
         var mapType = function(sqltype){
           if(_.filter(['int', 'byte', 'decimal', 'float', 'double', 'money', 'bit',
                         'numeric', 'real'],
@@ -239,6 +247,9 @@ SQLProxyServer.prototype.API = function(command){
       getSpecialColumn: (results, score)=>{
         return _.orderBy(Object.keys(results.columns)
                     .map(k => {
+                    	console.log("map");
+                        console.log(results.columns[k]);
+                        console.log(results.columns[k].type);
                         var type = results.columns[k].type.name.toLowerCase(); 
                         return { key: k, score: score(k, type) }
                       }),

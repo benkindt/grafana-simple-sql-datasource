@@ -46,6 +46,10 @@ drilldriver.prototype.connect = function(url){
 
 drilldriver.prototype.query = function(command, parameters){ 
     var driver = this;
+    console.log(isNumeric("78.01234"));
+    console.log(isNumeric("7"));
+    console.log(isNumeric("1996-01-01 00:00:00.0"));
+    console.log(isNumeric("abc"));
     return this.buildQuery(command, parameters)
       .then(sql => driver.post("/query.json", {"queryType" : "SQL", "query" : sql}));
 }
@@ -53,6 +57,18 @@ drilldriver.prototype.query = function(command, parameters){
 drilldriver.prototype.parseResults = function(results){
   if(!results || !results.rows.length)
     return {};
+    
+  var mapType = function(sqltype){
+    if(_.filter(['int', 'byte', 'decimal', 'float', 'double', 'money', 'bit',
+                  'numeric', 'real'],
+              (sqlt) => sqltype.indexOf(sqlt) != -1).length != 0) 
+      return "number";
+    if(_.filter(['date', 'time'],
+              (sqlt) => sqltype.indexOf(sqlt) != -1).length != 0) 
+      return "time";
+    return "string";
+  }  
+  
   // Try figure out types
   /*const typeCheck {
     number: function(n){
@@ -66,6 +82,11 @@ drilldriver.prototype.parseResults = function(results){
   });
   //  results.columns = results.columns.map(c => { reutrn {}})  
   return results;
+}
+
+drilldriver.prototype.isNumeric(num){
+	if (+num === +num) { return true; }
+	else { return false; }
 }
 
 module.exports = drilldriver;
