@@ -36,11 +36,15 @@ System.register(["lodash"], function (_export, _context) {
 
       _export("GenericDatasource", GenericDatasource = function () {
         function GenericDatasource(instanceSettings, $q, backendSrv, templateSrv) {
+        	console.log("---q2---");
+            console.log($q);
+            console.log("---backend---");
+            console.log(backendSrv);
           _classCallCheck(this, GenericDatasource);
-
           this.type = instanceSettings.type;
           this.url = instanceSettings.url || "";
           var m = /con\=(.*)/.exec(this.url.split("?")[1]);
+          console.log(m);
           this.connection = m ? m[1] : null;
           this.name = instanceSettings.name;
           this.q = $q;
@@ -76,11 +80,16 @@ System.register(["lodash"], function (_export, _context) {
         }, {
           key: "testDatasource",
           value: function testDatasource() {
+        	  console.log("---q2---");
+              console.log(this.q);
+              console.log("---backend2---");
+              console.log(this.backendSrv);
             return this.backendSrv.datasourceRequest({
               url: this.url,
               method: 'POST',
               data: this.buildRequest("test", null)
             }).then(function (result) {
+            	console.log("---result-log---");
               return { status: "success", message: "Data source is working", title: "Success" };
             }).catch(function (result) {
               return { status: "error", message: result, title: "Error" };

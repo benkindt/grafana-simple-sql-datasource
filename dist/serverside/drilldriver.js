@@ -37,6 +37,8 @@ drilldriver.prototype.post = function(url, data){
   }
   var req = client.post(this.options.url + url, args, defer.resolve);
   req.on('error', defer.reject);
+  console.log("req");
+  console.log(req);
   return defer.promise;
 }
 
@@ -46,10 +48,14 @@ drilldriver.prototype.connect = function(url){
 
 drilldriver.prototype.query = function(command, parameters){ 
     var driver = this;
-    console.log(isNumeric("78.01234"));
-    console.log(isNumeric("7"));
-    console.log(isNumeric("1996-01-01 00:00:00.0"));
-    console.log(isNumeric("abc"));
+    console.log(this.isNumeric("78.01234"));
+    console.log(this.isNumeric("7"));
+    console.log(this.isNumeric("1996-01-01 00:00:00.0"));
+    console.log(this.isNumeric("abc"));
+    
+    console.log("only letters");
+    console.log(this.isOnlyLetters("1996-01-01 00:00:00.0"));
+    console.log(this.isOnlyLetters("abc"));
     return this.buildQuery(command, parameters)
       .then(sql => driver.post("/query.json", {"queryType" : "SQL", "query" : sql}));
 }
@@ -84,9 +90,15 @@ drilldriver.prototype.parseResults = function(results){
   return results;
 }
 
-drilldriver.prototype.isNumeric(num){
+drilldriver.prototype.isNumeric = function(num){
 	if (+num === +num) { return true; }
 	else { return false; }
 }
+
+drilldriver.prototype.isOnlyLetters = function(str){
+	if (/[^a-zA-Z]/.test(str)){ return false; }
+	else { return true; }
+}
+
 
 module.exports = drilldriver;

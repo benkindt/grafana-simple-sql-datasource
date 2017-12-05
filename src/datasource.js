@@ -27,7 +27,7 @@ export class GenericDatasource {
     if (query.targets.length <= 0) {
       return this.q.when({data: []});
     }
-
+    
     return this.backendSrv.datasourceRequest({
       url: this.url,
       data: this.buildRequest("query", query ),
@@ -42,6 +42,7 @@ export class GenericDatasource {
       method: 'POST',
       data: this.buildRequest("test", null)
     }).then(result => {
+      console.log(result.data);
       return { status: "success", message: "Data source is working", title: "Success" };
     }).catch(result => {
       return { status: "error", message: result, title: "Error" };
