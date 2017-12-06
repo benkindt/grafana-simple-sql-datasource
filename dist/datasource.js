@@ -36,16 +36,10 @@ System.register(["lodash"], function (_export, _context) {
 
       _export("GenericDatasource", GenericDatasource = function () {
         function GenericDatasource(instanceSettings, $q, backendSrv, templateSrv) {
-        	console.log("---q2---");
-            console.log($q);
-            console.log("---backend---");
-            console.log(backendSrv);
+            console.log("---log GenericDatasource---");
           _classCallCheck(this, GenericDatasource);
           this.type = instanceSettings.type;
           this.url = instanceSettings.url || "";
-          var m = /con\=(.*)/.exec(this.url.split("?")[1]);
-          console.log(m);
-          this.connection = m ? m[1] : null;
           this.name = instanceSettings.name;
           this.q = $q;
           this.backendSrv = backendSrv;
@@ -53,45 +47,49 @@ System.register(["lodash"], function (_export, _context) {
         }
 
         _createClass(GenericDatasource, [{
-          key: "buildRequest",
-          value: function buildRequest(rqtype, data) {
-            return {
-              type: rqtype,
-              body: data,
-              url: this.connection
+          key: "buildDrillRequest",
+          value: function buildDrillRequest(sql) {
+        	  console.log("---log buildDrillRequest---");
+        	  console.log(sql);
+        	  console.log(this.url);
+            return { 
+            	"queryType" : "SQL", 
+            	"query" : sql
             };
           }
         }, {
           key: "query",
           value: function query(options) {
+        	  console.log("---log query---");
+        	  console.log(options);
             var query = this.buildQueryParameters(options);
-
+            
             if (query.targets.length <= 0) {
               return this.q.when({ data: [] });
             }
-
-            return this.backendSrv.datasourceRequest({
-              url: this.url,
-              data: this.buildRequest("query", query),
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' }
-            });
+            var temp = this.backendSrv.datasourceRequest({
+                url: this.url + "/query.json",
+                data: this.buildDrillRequest(query.targets[0].target),
+                method: 'POST'
+              });
+            console.log(temp);
+            return temp;
           }
         }, {
           key: "testDatasource",
           value: function testDatasource() {
-        	  console.log("---q2---");
-              console.log(this.q);
-              console.log("---backend2---");
-              console.log(this.backendSrv);
+              console.log("---log testDatasource---");
             return this.backendSrv.datasourceRequest({
-              url: this.url,
-              method: 'POST',
-              data: this.buildRequest("test", null)
+              url: this.url + "/query.json",
+              data: this.buildDrillRequest("SELECT * FROM cp.`employee.json` LIMIT 10"),
+              method: 'POST'
             }).then(function (result) {
-            	console.log("---result-log---");
+            	console.log("--- test successful ---");
+            	console.log(result);
               return { status: "success", message: "Data source is working", title: "Success" };
             }).catch(function (result) {
+            	console.log("--- test not successful ---");
+            	console.log(result);
               return { status: "error", message: result, title: "Error" };
             });
           }
