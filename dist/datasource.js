@@ -50,15 +50,14 @@ System.register(["lodash"], function (_export, _context) {
 
         _createClass(GenericDatasource, [{
           key: "buildDrillRequest",
-          value: function buildDrillRequest(sql, from, to, limit, interval) {
+          value: function buildDrillRequest(sql) {
         	  console.log("---log buildDrillRequest---");
         	  if(sql === 'undefined'){
-        		  return { 
+        		  return { // return some random example query
                   	"queryType" : "SQL", 
-                  	"query" : "SELECT salary as `value`, hire_date as `timestamp` FROM cp.`employee.json` WHERE hire_date > '1996-01-01' AND supervisor_id = 5"
+                  	"query" : "SELECT salary as `value`, hire_date as `timestamp` FROM cp.`employee.json`"
                   };
         	  }
-        	  console.log(this.url);
             return { 
             	"queryType" : "SQL", 
             	"query" : sql
@@ -74,7 +73,6 @@ System.register(["lodash"], function (_export, _context) {
             console.log(query.targets);
             
             query.targets = query.targets.filter(function (t) {
-            	console.log("query targets filter function");
             	var pass;
             	if((typeof t.hide) === 'undefined'){
             		t.hide = false;
@@ -84,41 +82,58 @@ System.register(["lodash"], function (_export, _context) {
             
             if (query.targets.length <= 0) {
             	console.log("query.targets.length <= 0 ... is " + query.targets.length);
-            	console.log(query.targets);
             	return this.q.when({ data: [] });
             }
-            var timeFunction = function toTimestamp(strDate){
-     		   var stamp = Date.parse(strDate);
-    		   return stamp;
+            var isNumeric = function(input){
+            	return /^\d+$/.test(input);
+            }
+            var timeFunction = function toTimestamp(date){
+     		   if(typeof(date) === "number"){
+     			  return date;
+     		   } else if (typeof(date) === "string"){
+     			  var isnum = isNumeric(date);
+     			  if(isnum){ // convert date to number datatype
+     				  return Number(date);
+     			  } else { // parse date from string format to number datatype
+     				 return Date.parse(date);
+     			  }
+     		   } else {
+     			  console.log("Wrong datatype for timestamp, expects date string or epoch in ms");
+     		   }
     		}
-            console.log("b4 return loadData");
             return this.loadData(query.targets[0].target, options.range.from.valueOf(), options.range.to.valueOf())
             .then(function (results) {
-            	console.log("---loadDate .then---");
-              var datapoints = results.data.rows.map(function (v) {
-            	  var val = Number.parseInt(v.value);
-            	  var timest = timeFunction(v.timestamp);
-            	  return [val, timest];
-              });
-              var data = [  { target: query.targets[0].target, datapoints: datapoints } ]; // maybe allow setting target name by input field?
-              console.log(data);
-              return { data: data };
+			    console.log("---loadDate .then---");
+				if(results.data.columns.length === 0){
+					console.log("Query returned no data.");
+					return { data: [] };
+				}
+				var datapoints = results.data.rows.map(function (v) {
+				  var val;
+				  if(isNumeric(v.value)){
+					  val = Number.parseInt(v.value);
+				  } else {
+					  val = v.value;
+				  }
+				  return [val, timeFunction(v.timestamp)];
+				});
+				// maybe allow setting target name by input field?
+				var data = [  { target: query.targets[0].target, datapoints: datapoints } ];
+				console.log(data);
+				return { data: data };
             });
           }
         }, {
           key: "testDatasource",
           value: function testDatasource() {
-              console.log("---log testDatasource---");
             return this.backendSrv.datasourceRequest({
               url: this.url + "/query.json",
               data: this.buildDrillRequest("SELECT * FROM cp.`employee.json` LIMIT 10"),
               method: 'POST'
             }).then(function (result) {
-            	console.log("--- test successful ---");
             	console.log(result);
               return { status: "success", message: "Data source is working", title: "Success" };
             }).catch(function (result) {
-            	console.log("--- test not successful ---");
             	console.log(result);
               return { status: "error", message: result, title: "Error" };
             });
@@ -145,27 +160,21 @@ System.register(["lodash"], function (_export, _context) {
               // TODO: Parser?
               return this.q.when([]);
             var target = opsAsString ? options : options.target;
-            var interpolated = {
-              target: this.templateSrv.replace(target, null, 'regex')
-            };
-
             return this.backendSrv.datasourceRequest({
-              url: this.url,
-              data: this.buildRequest("search", interpolated),
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' }
+                url: this.url + "/query.json",
+                data: this.buildDrillRequest(target),
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
             }).then(this.mapToTextValue);
           }
         }, {
           key: "mapToTextValue",
           value: function mapToTextValue(result) {
-            return _.map(result.data, function (d, i) {
-              if (d && d.text && d.value) {
-                return { text: d.text, value: d.value };
-              } else if (_.isObject(d)) {
-                return { text: d, value: i };
-              }
-              return { text: d, value: d };
+        	console.log(result);
+        	console.log(result.data.rows);
+        	var lf = result.data.columns[0];
+            return _.map(result.data.rows, function (d, i) {
+				return { text: d[lf], value: d[lf] };
             });
           }
         }, {
@@ -180,15 +189,15 @@ System.register(["lodash"], function (_export, _context) {
                 data: this.buildDrillRequest(sql, from, to, limit, interval),
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }
-//                params: {
-//                  items: items,
-//                  properties: properties,
-//                  from: from,
-//                  to: to,
-//                  limit: limit,
-//                  interval: interval,
-//                  op: 'avg'
-//                }
+// params: {
+// items: items,
+// properties: properties,
+// from: from,
+// to: to,
+// limit: limit,
+// interval: interval,
+// op: 'avg'
+// }
               }).then(function (response) {
                 if (response.status === 200) {
                   if (!response.data) {
@@ -226,4 +235,4 @@ System.register(["lodash"], function (_export, _context) {
     }
   };
 });
-//# sourceMappingURL=datasource.js.map
+// # sourceMappingURL=datasource.js.map
