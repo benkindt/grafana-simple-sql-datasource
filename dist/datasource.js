@@ -36,7 +36,7 @@ System.register(["lodash"], function (_export, _context) {
 
       _export("GenericDatasource", GenericDatasource = function () {
         function GenericDatasource(instanceSettings, $q, backendSrv, templateSrv) {
-            console.log("---log GenericDatasource---");
+          console.log("---log GenericDatasource---");
           _classCallCheck(this, GenericDatasource);
           this.type = instanceSettings.type;
           this.url = instanceSettings.url || "";
@@ -50,8 +50,10 @@ System.register(["lodash"], function (_export, _context) {
 
         _createClass(GenericDatasource, [{
           key: "buildDrillRequest",
-          value: function buildDrillRequest(sql) {
+          value: function buildDrillRequest(sql, from, to, limit, interval) {
         	  console.log("---log buildDrillRequest---");
+        	  // replace $from and $to
+        	  
         	  if(sql === 'undefined'){
         		  return { // return some random example query
                   	"queryType" : "SQL", 
@@ -66,59 +68,87 @@ System.register(["lodash"], function (_export, _context) {
         }, {
           key: "query",
           value: function query(options) {
-        	  console.log("---log query ... test---");
-        	  console.log(options);
+        	 var isNumeric = function(input){
+               return /^\d+$/.test(input);
+             }
+             var timeFunction = function toTimestamp(date){
+       		   if(typeof(date) === "number"){
+       			  return date;
+       		   } else if (typeof(date) === "string"){
+       			  var isnum = isNumeric(date);
+       			  if(isnum){ // convert date to number datatype
+       				 return Number(date);
+       			  } else { // parse date from string format to number datatype
+       				 return Date.parse(date);
+       			  }
+       		   } else {
+       			  console.log("Wrong datatype for timestamp, expects date string or epoch in ms");
+       		   }
+      		}
+    	    console.log("---log query ... test---");
+    	    console.log(options);
             var query = this.buildQueryParameters(options);
             
             console.log(query.targets);
             
             query.targets = query.targets.filter(function (t) {
-            	var pass;
             	if((typeof t.hide) === 'undefined'){
             		t.hide = false;
             	}
                 return !t.hide;
             });
             
+            var isTableQuery = false;
+            if (query.targets[0].type === 'table'){
+            	console.log("is Table Query");
+            	isTableQuery = true;
+            }
+            
             if (query.targets.length <= 0) {
             	console.log("query.targets.length <= 0 ... is " + query.targets.length);
             	return this.q.when({ data: [] });
             }
-            var isNumeric = function(input){
-            	return /^\d+$/.test(input);
-            }
-            var timeFunction = function toTimestamp(date){
-     		   if(typeof(date) === "number"){
-     			  return date;
-     		   } else if (typeof(date) === "string"){
-     			  var isnum = isNumeric(date);
-     			  if(isnum){ // convert date to number datatype
-     				  return Number(date);
-     			  } else { // parse date from string format to number datatype
-     				 return Date.parse(date);
-     			  }
-     		   } else {
-     			  console.log("Wrong datatype for timestamp, expects date string or epoch in ms");
-     		   }
-    		}
+            
             return this.loadData(query.targets[0].target, options.range.from.valueOf(), options.range.to.valueOf())
             .then(function (results) {
 			    console.log("---loadDate .then---");
+			    console.log(results);
 				if(results.data.columns.length === 0){
 					console.log("Query returned no data.");
 					return { data: [] };
 				}
-				var datapoints = results.data.rows.map(function (v) {
-				  var val;
-				  if(isNumeric(v.value)){
-					  val = Number.parseInt(v.value);
-				  } else {
-					  val = v.value;
-				  }
-				  return [val, timeFunction(v.timestamp)];
-				});
-				// maybe allow setting target name by input field?
-				var data = [  { target: query.targets[0].target, datapoints: datapoints } ];
+				
+				var data;
+				if(isTableQuery){
+					console.log("Transform drill result for Table Query");
+					var columns = results.data.columns.map(function (v) {
+						
+					}
+					var datapoints = results.data.rows.map(function (v) {
+					  var val;
+					  if(isNumeric(v.value)){
+						  val = Number.parseInt(v.value);
+					  } else {
+						  val = v.value;
+					  }
+					  return [val, timeFunction(v.timestamp)];
+					});
+					// maybe allow setting target name by input field?
+					data = [  { columns: columns, rows: datapoints, type: "table" } ];
+				} else { // else is timeseries
+					console.log("Transform drill result for Timeseries Query");
+					var datapoints = results.data.rows.map(function (v) {
+					  var val;
+					  if(isNumeric(v.value)){
+						  val = Number.parseInt(v.value);
+					  } else {
+						  val = v.value;
+					  }
+					  return [val, timeFunction(v.timestamp)];
+					});
+					// maybe allow setting target name by input field?
+					data = [  { target: query.targets[0].target, datapoints: datapoints } ];
+				}
 				console.log(data);
 				return { data: data };
             });
@@ -189,15 +219,6 @@ System.register(["lodash"], function (_export, _context) {
                 data: this.buildDrillRequest(sql, from, to, limit, interval),
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }
-// params: {
-// items: items,
-// properties: properties,
-// from: from,
-// to: to,
-// limit: limit,
-// interval: interval,
-// op: 'avg'
-// }
               }).then(function (response) {
                 if (response.status === 200) {
                   if (!response.data) {
@@ -223,7 +244,6 @@ System.register(["lodash"], function (_export, _context) {
             });
 
             clonedOptions.targets = targets;
-
             return clonedOptions;
           }
         }]);
@@ -235,4 +255,3 @@ System.register(["lodash"], function (_export, _context) {
     }
   };
 });
-// # sourceMappingURL=datasource.js.map
