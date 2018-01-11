@@ -52,8 +52,10 @@ System.register(["lodash"], function (_export, _context) {
           key: "buildDrillRequest",
           value: function buildDrillRequest(sql, from, to, limit, interval) {
         	  console.log("---log buildDrillRequest---");
-        	  // replace $from and $to
-        	  
+        	  // replace $from and $to in query string
+        	  console.log(from);
+        	  var timedsql = sql.replace("'$from'", from).replace("'$to'", to);
+        	  console.log(timedsql);
         	  if(sql === 'undefined'){
         		  return { // return some random example query
                   	"queryType" : "SQL", 
@@ -62,7 +64,7 @@ System.register(["lodash"], function (_export, _context) {
         	  }
             return { 
             	"queryType" : "SQL", 
-            	"query" : sql
+            	"query" : timedsql
             };
           }
         }, {
@@ -82,7 +84,7 @@ System.register(["lodash"], function (_export, _context) {
        				 return Date.parse(date);
        			  }
        		   } else {
-       			  console.log("Wrong datatype for timestamp, expects date string or epoch in ms");
+       			  console.log("No 'timestamp' column or wrong datatype, expects date string or epoch in ms.");
        		   }
       		}
     	    console.log("---log query ... test---");
@@ -121,17 +123,39 @@ System.register(["lodash"], function (_export, _context) {
 				var data;
 				if(isTableQuery){
 					console.log("Transform drill result for Table Query");
-					var columns = results.data.columns.map(function (v) {
-						
-					}
+					var columns = results.data.columns.map(function (v, index) {
+						if(v === "timestamp"){
+							console.log("Found timestamp column.");
+							return { text: v, type: "time", "sort": true, "desc": true };
+						} else {
+							if(isNumeric(results.data.rows[0][v])){
+								console.log(index + " is Number " + v);
+								return { text: v, type: "Number" };
+							} else {
+								console.log(index + " is String " + v);
+								return { text: v, type: "String" };
+							}
+							
+						}
+					});
 					var datapoints = results.data.rows.map(function (v) {
-					  var val;
-					  if(isNumeric(v.value)){
-						  val = Number.parseInt(v.value);
-					  } else {
-						  val = v.value;
-					  }
-					  return [val, timeFunction(v.timestamp)];
+					  var array = [];
+					  columns.forEach(function(el) {
+						  var val;
+						  if(isNumeric(v[el.text])){
+							  if(el.text === "timestamp"){
+								  var date = new Date(parseInt(v[el.text]));
+//								  val = v[el.text];
+								  val = date.toLocaleString();
+							  } else {
+								  val = Number.parseFloat(v[el.text]);
+							  }
+						  } else {
+							  val = v[el.text];
+						  }
+						  array.push(val);
+					  });
+					  return array;
 					});
 					// maybe allow setting target name by input field?
 					data = [  { columns: columns, rows: datapoints, type: "table" } ];
@@ -210,7 +234,7 @@ System.register(["lodash"], function (_export, _context) {
         }, {
             key: 'loadData',
             value: function loadData(sql, from, to) {
-            	console.log("---loadData--- items & properties following");
+              console.log("---loadData---");
               var interval = Math.round((to - from) / this.maxDataPoints);
               var limit = this.maxDataPoints / this.buckets;
               var self = this;

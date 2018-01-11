@@ -1,39 +1,29 @@
 # grafana-simple-sql-datasource
 
-Allows querying SQL based datasources like SQL Server.
+Allows querying Apache Drill.
 
 ![SQL Plugi](https://raw.githubusercontent.com/gbrian/grafana-simple-sql-datasource/master/overview.png "Query editor")
 
 
 ## Usage
-Currently the plugin requires a proxy server running to communicate with the database.
-
-**Install sqlproxyserver**
- 
- * Run `npm install` at the `dist/serverside` folder to install all dependencies
- * Run npm install on the plugin directory
- * Run server side code `dist/serverside/sqlproxyserver.js`
- * Test on your browser `http://myserver:port/?con=mssql://user:name@server/database` you must get a `{"status":"success"}` response
+Copy the plugin into Grafana plugin folder.
 
 **Add new datasource**
 Add a new datasource to Grafana and set the url to:
 
 ````
-http://myserver:port/con=mssql://user:name@server/database
-http://myserver:port/con=drill:server:port
+http://myserver:port
 ````
 
 Where:
+ * **myserver:port** : The server where Apache Drill is running, usually on port 8047.
 
- * **myserver:port** : Is the server where `sqlproxyserver` is running
- * **con**: Specifies the sql connection string
+Verify connection:
+* Datasource working reply after creation.
+* Check data source type (Drill).
+* If not working try switch Access-Mode (direct | proxy).
+* Check ip/port.
 
-## SQL Databases
-Currently supported SQL databases
-
-### SQL Server
-SQL Server connection is managed by the mssqp package https://www.npmjs.com/package/mssql  
-  
 ## Features
 Following features has been implemented
 
@@ -43,22 +33,14 @@ Following features has been implemented
 It is possible to define two different types: `timeseries` and `table`
 
 ### Annotation
-Annotation querires must return the following fields:
- 
- * **title**: Annotation header
- * **text**:  Annotation description
- * **tags**: Annotation tags
- * **time**: Annotation time
+Annotations are not supported.
 
 ## Notes
-### Time
-UTC and Localtime. Currently you must specify if time returned by the query is UTC or local. 
-The plugin will convert localtime to UTC in order to be correctly renderer.
 ### Template
 You can use `$from` and `$to` to refer to selected time period in your queries like:
-
+You can add custom variables via Manage Dashboard -> Templating and use them just like '$from' and '$to'. See '$client'.
 ````
-SELECT field FROM table WHERE datestart >= '$from' AND dateStart <= '$to'
+SELECT `message` as `value`, `Timestamp` as `timestamp` FROM dfs.`tmp/.../` WHERE `timestamp` >= '$from' AND `timestamp` <= '$to' AND `Client` LIKE '$client'
 ```` 
 
 ## Thanks to
