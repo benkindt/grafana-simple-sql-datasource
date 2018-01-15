@@ -1,65 +1,56 @@
 # grafana-simple-sql-datasource
 
-Allows querying SQL based datasources like SQL Server.
+Allows querying Apache Drill.
 
 ![SQL Plugi](https://raw.githubusercontent.com/gbrian/grafana-simple-sql-datasource/master/overview.png "Query editor")
 
 
 ## Usage
-Currently the plugin requires a proxy server running to communicate with the database.
+Copy the plugin into Grafana plugin folder.
 
-**Install sqlproxyserver**
- 
- * Run `npm install` at the `dist/serverside` folder to install all dependencies
- * Run npm install on the plugin directory
- * Run server side code `dist/serverside/sqlproxyserver.js`
- * Test on your browser `http://myserver:port/con=mssql://user:name@server/database` you must get a `{"status":"sucess"}` response
-
-**Add new datasource**
-Add a new datasource to Grafana and set the url to:
+**Add new datasource to Grafana and set the url to:**
 
 ````
-http://myserver:port/con=mssql://user:name@server/database
+http://myserver:port
 ````
 
 Where:
+ * **myserver:port** : the server where Apache Drill is running, usually on port 8047.
 
- * **myserver:port** : Is the server where `sqlproxyserver` is running
- * **con**: Specifies the sql connection string
+Verify connection:
+* "Datasource working" reply after datasource creation.
 
-## SQL Databases
-Currently supported SQL databases
+If not working, try:
+* Check data source type (Drill).
+* Check ip & port.
+* Switch Access-Mode (direct | proxy).
 
-### SQL Server
-SQL Server connection is managed by the mssqp package https://www.npmjs.com/package/mssql  
-  
 ## Features
 Following features has been implemented
-
-![Query editor](https://raw.githubusercontent.com/gbrian/grafana-simple-sql-datasource/master/query_editor.png "Query editor")
 
 ### Metrics
 It is possible to define two different types: `timeseries` and `table`
 
 ### Annotation
-Annotation querires must return the following fields:
- 
- * **title**: Annotation header
- * **text**:  Annotation description
- * **tags**: Annotation tags
- * **time**: Annotation time
+Annotations are not supported so far.
 
 ## Notes
-### Time
-UTC and Localtime. Currently you must specify if time returned by the query is UTC or local. 
-The plugin will convert localtime to UTC in order to be correctly renderer.
 ### Template
-You can use `$from` and `$to` to refer to selected time period in your queries like:
-
+You can use `$from` and `$to` to refer to the selected time period in your queries.
+(strings are replaced in javascript query function)
 ````
-SELECT field FROM table WHERE datestart >= '$from' AND dateStart <= '$to'
+SELECT `message` as `value`, `Timestamp` as `timestamp` FROM dfs.`tmp/.../` 
+WHERE `timestamp` >= '$from' AND `timestamp` <= '$to' AND `Client` LIKE '$client'
 ```` 
+You can also add custom variables to your dashboard. Go to "Manage Dashboard -> Templating" and use them just like '$from' and '$to' in the queries. See '$client'. (select variable value with dropdown in Grafana)
 
+### Grunt
+You can use Grunt for automation. Change code in src folder and run `grunt` or use `grunt watch`. See gruntfile.js for more information what's happening.
+````
+npm install -g grunt-cli
+npm install grunt --save-dev
+grunt
+```` 
 ## Thanks to
 Grafana team and [@bergquist](https://github.com/bergquist)
  
