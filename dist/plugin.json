@@ -1,5 +1,5 @@
 {
-  "name": "Apache Drill",
+  "name": "SimpleSql",
   "id": "grafana-simple-sql-datasource",
   "type": "datasource",
 
@@ -11,7 +11,7 @@
   "annotations": true,
 
   "info": {
-    "description": "drill datasource",
+    "description": "simple sql datasource",
     "author": {
       "name": "GBrian.",
       "url": ""
