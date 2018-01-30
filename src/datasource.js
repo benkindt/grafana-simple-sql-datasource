@@ -13,7 +13,7 @@ export class GenericDatasource {
     this.templateSrv = templateSrv;
   }
 
-  buildRequest(sql, from, to, limit, interval){
+  buildDrillRequest(sql, from, to, limit, interval){
 	  console.log("---log buildDrillRequest---");
 	  // replace $from and $to in query string
 	  console.log(from);
@@ -161,7 +161,7 @@ export class GenericDatasource {
     return this.backendSrv.datasourceRequest({
       url: this.url,
       method: 'POST',
-      data: this.buildRequest("annotations", annotationQuery)
+      data: this.buildDrillRequest("annotations", annotationQuery)
     }).then(result => {
       return result.data;
     });
