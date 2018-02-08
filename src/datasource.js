@@ -49,10 +49,10 @@ export class GenericDatasource {
   			  console.log("No 'timestamp' column or wrong datatype, expects date string or epoch in ms.");
   		   }
  		}
+
 //	    console.log("---log query ... test---");
 //	    console.log(options);
-	    var query = this.buildQueryParameters(options);
-       
+	    var query = this.buildQueryParameters(options);   
 //       console.log(query.targets);
        
        query.targets = query.targets.filter(function (t) {

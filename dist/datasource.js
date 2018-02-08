@@ -91,10 +91,10 @@ System.register(["lodash"], function (_export, _context) {
                 console.log("No 'timestamp' column or wrong datatype, expects date string or epoch in ms.");
               }
             };
+
             //	    console.log("---log query ... test---");
             //	    console.log(options);
             var query = this.buildQueryParameters(options);
-
             //       console.log(query.targets);
 
             query.targets = query.targets.filter(function (t) {
@@ -106,7 +106,9 @@ System.register(["lodash"], function (_export, _context) {
 
             var isTableQuery = false;
             if (query.targets[0].type === 'table') {
+
               //       	console.log("is Table Query");
+
               isTableQuery = true;
             }
 
