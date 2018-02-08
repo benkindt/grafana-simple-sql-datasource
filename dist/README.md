@@ -35,13 +35,14 @@ It is possible to define two different types: `timeseries` and `table`
 Annotations are not supported so far.
 
 ## Notes
-### Template
+### Templating
 You can use `$from` and `$to` to refer to the selected time period in your queries.
 (strings are replaced in javascript query function)
 ````
 SELECT `message` as `value`, `Timestamp` as `timestamp` FROM dfs.`tmp/.../` 
 WHERE `timestamp` >= '$from' AND `timestamp` <= '$to' AND `Client` LIKE '$client'
 ```` 
+### Grafana Templating
 You can also add custom variables to your dashboard. Go to "Manage Dashboard -> Templating" and use them just like '$from' and '$to' in the queries. See '$client'. (select variable value with dropdown in Grafana)
 
 ### Grunt
