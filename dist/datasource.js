@@ -49,13 +49,14 @@ System.register(["lodash"], function (_export, _context) {
         }
 
         _createClass(GenericDatasource, [{
-          key: "buildRequest",
-          value: function buildRequest(sql, from, to, limit, interval) {
+          key: "buildDrillRequest",
+          value: function buildDrillRequest(sql, from, to, limit, interval) {
             console.log("---log buildDrillRequest---");
             // replace $from and $to in query string
             console.log(from);
+//            var timedsql = sql.replace("'$from'", from - 3600000).replace("'$to'", to + 3600000);
             var timedsql = sql.replace("'$from'", from).replace("'$to'", to);
-            console.log(timedsql);
+            //	  console.log(timedsql);
             if (sql === 'undefined') {
               return { // return some random example query
                 "queryType": "SQL",
@@ -90,11 +91,11 @@ System.register(["lodash"], function (_export, _context) {
                 console.log("No 'timestamp' column or wrong datatype, expects date string or epoch in ms.");
               }
             };
-            console.log("---log query ... test---");
-            console.log(options);
+            //	    console.log("---log query ... test---");
+            //	    console.log(options);
             var query = this.buildQueryParameters(options);
 
-            console.log(query.targets);
+            //       console.log(query.targets);
 
             query.targets = query.targets.filter(function (t) {
               if (typeof t.hide === 'undefined') {
@@ -105,7 +106,7 @@ System.register(["lodash"], function (_export, _context) {
 
             var isTableQuery = false;
             if (query.targets[0].type === 'table') {
-              console.log("is Table Query");
+              //       	console.log("is Table Query");
               isTableQuery = true;
             }
 
@@ -115,7 +116,7 @@ System.register(["lodash"], function (_export, _context) {
             }
 
             return this.loadData(query.targets[0].target, options.range.from.valueOf(), options.range.to.valueOf()).then(function (results) {
-              console.log("---loadDate .then---");
+              //		    console.log("---loadDate .then---");
               console.log(results);
               if (results.data.columns.length === 0) {
                 console.log("Query returned no data.");
@@ -203,7 +204,7 @@ System.register(["lodash"], function (_export, _context) {
             return this.backendSrv.datasourceRequest({
               url: this.url,
               method: 'POST',
-              data: this.buildRequest("annotations", annotationQuery)
+              data: this.buildDrillRequest("annotations", annotationQuery)
             }).then(function (result) {
               return result.data;
             });
@@ -226,8 +227,8 @@ System.register(["lodash"], function (_export, _context) {
         }, {
           key: "mapToTextValue",
           value: function mapToTextValue(result) {
-            console.log(result);
-            console.log(result.data.rows);
+            //	console.log(result);
+            //	console.log(result.data.rows);
             var lf = result.data.columns[0];
             return _.map(result.data.rows, function (d, i) {
               return { text: d[lf], value: d[lf] };
@@ -236,7 +237,7 @@ System.register(["lodash"], function (_export, _context) {
         }, {
           key: "loadData",
           value: function loadData(sql, from, to) {
-            console.log("---loadData---");
+            //      console.log("---loadData---");
             var interval = Math.round((to - from) / this.maxDataPoints);
             var limit = this.maxDataPoints / this.buckets;
             var self = this;
