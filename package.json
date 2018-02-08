@@ -1,5 +1,5 @@
 {
-  "name": "grafana-simple-sql-datasource",
+  "name": "grafana-drill-datasource",
   "private": true,
   "version": "1.0.0",
   "description": "",
@@ -9,12 +9,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gbrian/grafana-simple-sql-datasource.git"
+    "url": "git+https://github.com/benkindt/grafana-drill-datasource.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/gbrian/grafana-simple-sql-datasource/issues"
+    "url": "https://github.com/benkindt/grafana-drill-datasource/issues"
   },
   "devDependencies": {
     "babel": "~6.5.1",
@@ -46,5 +46,5 @@
     "node-rest-client": "^2.5.0",
     "q": "^1.4.1"
   },
-  "homepage": "https://github.com/gbrian/grafana-simple-sql-datasource#readme"
+  "homepage": "https://github.com/benkindt/grafana-drill-datasource#readme"
 }

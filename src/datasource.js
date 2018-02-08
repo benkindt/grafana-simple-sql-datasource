@@ -17,7 +17,8 @@ export class GenericDatasource {
 	  console.log("---log buildDrillRequest---");
 	  // replace $from and $to in query string
 	  console.log(from);
-	  var timedsql = sql.replace("'$from'", from - 3600000).replace("'$to'", to + 3600000);
+//    var timedsql = sql.replace("'$from'", from - 3600000).replace("'$to'", to + 3600000);	  
+	  var timedsql = sql.replace("'$from'", from).replace("'$to'", to);
 //	  console.log(timedsql);
 	  if(sql === 'undefined'){
 		  return { // return some random example query

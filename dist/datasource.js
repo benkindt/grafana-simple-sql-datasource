@@ -54,7 +54,7 @@ System.register(["lodash"], function (_export, _context) {
             console.log("---log buildDrillRequest---");
             // replace $from and $to in query string
             console.log(from);
-//            var timedsql = sql.replace("'$from'", from - 3600000).replace("'$to'", to + 3600000);
+            //    var timedsql = sql.replace("'$from'", from - 3600000).replace("'$to'", to + 3600000);	  
             var timedsql = sql.replace("'$from'", from).replace("'$to'", to);
             //	  console.log(timedsql);
             if (sql === 'undefined') {
@@ -106,9 +106,7 @@ System.register(["lodash"], function (_export, _context) {
 
             var isTableQuery = false;
             if (query.targets[0].type === 'table') {
-
               //       	console.log("is Table Query");
-
               isTableQuery = true;
             }
 
