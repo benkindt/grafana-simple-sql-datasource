@@ -1,6 +1,6 @@
-# grafana-simple-sql-datasource
+# grafana-drill-datasource
 
-Allows querying Apache Drill.
+Allows querying Apache Drill via REST interface.
 
 ![SQL Plugi](https://raw.githubusercontent.com/gbrian/grafana-simple-sql-datasource/master/overview.png "Query editor")
 
@@ -51,6 +51,5 @@ npm install -g grunt-cli
 npm install grunt --save-dev
 grunt
 ```` 
-## Thanks to
-Grafana team and [@bergquist](https://github.com/bergquist)
+
  
