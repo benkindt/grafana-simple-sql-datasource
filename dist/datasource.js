@@ -54,7 +54,7 @@ System.register(["lodash"], function (_export, _context) {
             console.log("---log buildDrillRequest---");
             // replace $from and $to in query string
             console.log(from);
-//            var timedsql = sql.replace("'$from'", from - 3600000).replace("'$to'", to + 3600000);
+            //    var timedsql = sql.replace("'$from'", from - 3600000).replace("'$to'", to + 3600000);	  
             var timedsql = sql.replace("'$from'", from).replace("'$to'", to);
             //	  console.log(timedsql);
             if (sql === 'undefined') {
@@ -91,9 +91,24 @@ System.register(["lodash"], function (_export, _context) {
                 console.log("No 'timestamp' column or wrong datatype, expects date string or epoch in ms.");
               }
             };
+
             //	    console.log("---log query ... test---");
             //	    console.log(options);
             var query = this.buildQueryParameters(options);
+            //       console.log(query.targets);
+
+            query.targets = query.targets.filter(function (t) {
+              if (typeof t.hide === 'undefined') {
+                t.hide = false;
+              }
+              return !t.hide;
+            });
+
+            var isTableQuery = false;
+            if (query.targets[0].type === 'table') {
+              //       	console.log("is Table Query");
+              isTableQuery = true;
+            }
 
             //       console.log(query.targets);
 

@@ -17,8 +17,9 @@ export class GenericDatasource {
 	  console.log("---log buildDrillRequest---");
 	  // replace $from and $to in query string
 	  console.log(from);
-	  var timedsql = sql.replace("'$from'", from - 3600000).replace("'$to'", to + 3600000);
-//	  console.log(timedsql);
+    //    var timedsql = sql.replace("'$from'", from - 3600000).replace("'$to'", to + 3600000);	  
+	  var timedsql = sql.replace("'$from'", from).replace("'$to'", to);
+    //	  console.log(timedsql);
 	  if(sql === 'undefined'){
 		  return { // return some random example query
           	"queryType" : "SQL", 
@@ -52,7 +53,6 @@ export class GenericDatasource {
 //	    console.log("---log query ... test---");
 //	    console.log(options);
 	    var query = this.buildQueryParameters(options);
-       
 //       console.log(query.targets);
        
        query.targets = query.targets.filter(function (t) {

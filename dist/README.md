@@ -51,6 +51,4 @@ You can use Grunt for automation. Change code in src folder and run `grunt` or u
 npm install -g grunt-cli
 npm install grunt --save-dev
 grunt
-```` 
-
- 
+````
