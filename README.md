@@ -42,6 +42,7 @@ You can use `$from` and `$to` to refer to the selected time period in your queri
 SELECT `message` as `value`, `Timestamp` as `timestamp` FROM dfs.`tmp/.../` 
 WHERE `timestamp` >= '$from' AND `timestamp` <= '$to' AND `Client` LIKE '$client'
 ```` 
+
 ### Grafana Templating
 You can also add custom variables to your dashboard. Go to "Manage Dashboard -> Templating" and use them just like '$from' and '$to' in the queries. See '$client'. (select variable value with dropdown in Grafana)
 
@@ -52,3 +53,4 @@ npm install -g grunt-cli
 npm install grunt --save-dev
 grunt
 ````
+

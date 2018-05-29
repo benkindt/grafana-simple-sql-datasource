@@ -110,6 +110,21 @@ System.register(["lodash"], function (_export, _context) {
               isTableQuery = true;
             }
 
+            //       console.log(query.targets);
+
+            query.targets = query.targets.filter(function (t) {
+              if (typeof t.hide === 'undefined') {
+                t.hide = false;
+              }
+              return !t.hide;
+            });
+
+            var isTableQuery = false;
+            if (query.targets[0].type === 'table') {
+              //       	console.log("is Table Query");
+              isTableQuery = true;
+            }
+
             if (query.targets.length <= 0) {
               console.log("query.targets.length <= 0 ... is " + query.targets.length);
               return this.q.when({ data: [] });
